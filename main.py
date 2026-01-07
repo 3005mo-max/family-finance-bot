@@ -1,29 +1,15 @@
-import os
-import logging
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-TOKEN = os.getenv("BOT_TOKEN")
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import os
+import asyncio
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("✅ Bot is alive. Напиши /ping")
+    await update.message.reply_text("Бот запущен")
 
-async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🏓 pong")
-
-def main():
-    if not TOKEN:
-        raise RuntimeError("BOT_TOKEN is not set in environment variables")
-
-    app = Application.builder().token(TOKEN).build()
+async def main():
+    app = ApplicationBuilder().token(os.environ["BOT_TOKEN"]).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("ping", ping))
-
-    logger.info("Starting bot polling...")
-    app.run_polling(drop_pending_updates=True)
+    await app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
